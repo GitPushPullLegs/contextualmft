@@ -10,7 +10,7 @@ if __name__ == '__main__':
     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
     mft = Client(host=keyring.get_password('mcs', 'mft_host'))
     mft.login(username=keyring.get_password('mcs', 'ae-user'), password=keyring.get_password('mcs', 'ae-pass'))
-    input_files = sys.argv[1:]  # Omit main.py.
+    input_files = [x.replace("\"", "") for x in sys.argv[1:]]  # Omit main.py.
     mft_files = []
     for file in input_files:
         if os.path.isdir(file):
