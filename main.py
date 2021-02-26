@@ -6,6 +6,7 @@ import os
 import glob
 from datetime import datetime
 from win10toast import ToastNotifier
+import pyperclip
 
 if __name__ == '__main__':
     toaster = ToastNotifier()
@@ -35,3 +36,10 @@ if __name__ == '__main__':
         for file in mft_files:
             output_file.write(f"{file}\n")
         output_file.close()
+        if pyperclip.is_available():
+            pyperclip.copy(f"{link}\nPassword: {password}")
+            toaster.show_toast(title="MFT Link Generated",
+                               msg="The link and password have been copied to your clipboard.")
+        else:
+            toaster.show_toast(title="MFT Link Generated",
+                               msg="Details in the txt file.")
