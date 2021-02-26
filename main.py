@@ -59,9 +59,12 @@ def get_mft_credentials():
     pswd_input = ttk.Entry(window, width=50, show="*")
     pswd_input.grid(row=2, column=1)
 
-    submit_btn = ttk.Button(window, text="Login", command= lambda: set_credentials(window=window, host=host_input.get(), username=username_input.get(), password=pswd_input.get()))
+    submit_btn = ttk.Button(window, text="Login", command=lambda: set_credentials(window=window, host=host_input.get(),
+                                                                                  username=username_input.get(),
+                                                                                  password=pswd_input.get()))
     submit_btn.grid(row=4, column=0)
     window.mainloop()
+
 
 if __name__ == '__main__':
     username = getpass.getuser()
@@ -86,12 +89,13 @@ if __name__ == '__main__':
                            msg="Cannot share more than 20 files at a time.",
                            threaded=True)
     else:
-        mft = Client(host=keyring.get_password('mft', 'host'))
+
         while True:
             try:
+                mft = Client(host=keyring.get_password('mft', 'host'))
                 mft.login(username=keyring.get_password('mft', 'user'), password=keyring.get_password('mft', 'pswd'))
                 break
-            except ConnectionRefusedError:
+            except:
                 get_mft_credentials()
                 pass
 
