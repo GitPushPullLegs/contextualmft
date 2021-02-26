@@ -30,5 +30,8 @@ if __name__ == '__main__':
         link = mft.create_file_share(share_type=Client.ShareType.send, files=mft_files, password=password, subject=f'MFT Context Menu Share {timestamp}')
         output_file = open(os.path.join(os.path.split(input_files[0])[0], 'MFT Context Menu Share {timestamp}.txt'), 'w')
         output_file.write(f"Link: {link}\n")
-        output_file.write(f"Password: {password}\n")
+        output_file.write(f"Password: {password}\n\n")
+        output_file.write(f"Files:\n")
+        for file in mft_files:
+            output_file.write(f"{file}\n")
         output_file.close()
