@@ -7,8 +7,37 @@ import glob
 from datetime import datetime
 from win10toast import ToastNotifier
 import pyperclip
+import getpass
+import win32com.client
+
+
+def setup(username: str):
+    print(os.path.join(os.path.split(__file__)[0], 'Trigger.bat'))
+    file_pieces = "/".join(__file__.split("/")[:-1])
+    # Make trigger bat script.
+    with open(os.path.join(os.path.split(__file__)[0], 'Trigger.bat'), 'w') as bat:
+        bat.writelines([
+            f"\"{file_pieces}/venv/Scripts/python.exe\" ",
+            f"\"{__file__}\" ",
+            f"\"\"%*\"\""
+        ])
+
+    path = rf"C:\Users\{username}\AppData\Roaming\Microsoft\Windows\SendTo\Share with MFT.lnk"
+    target = os.path.join(os.path.split(__file__)[0], 'Trigger.bat')
+
+    shell = win32com.client.Dispatch('WScript.Shell')
+    shortcut = shell.CreateShortCut(path)
+    shortcut.Targetpath = target
+    shortcut.WindowStyle = 7
+    shortcut.save()
+
 
 if __name__ == '__main__':
+    username = getpass.getuser()
+    send_to_path = rf"C:\Users\{username}\AppData\Roaming\Microsoft\Windows\SendTo"
+    if not glob.glob(send_to_path + '/Share with MFT*'):
+        setup(username)
+
     toaster = ToastNotifier()
     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
 
