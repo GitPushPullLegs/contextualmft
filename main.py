@@ -33,8 +33,9 @@ def setup(username: str):
     shortcut.save()
 
 
-def set_credentials(window, username: str, password: str):
+def set_credentials(window, host: str, username: str, password: str):
     window.destroy()
+    keyring.set_password('mft', 'host', host)
     keyring.set_password('mft', 'user', username)
     keyring.set_password('mft', 'pswd', password)
 
@@ -43,17 +44,22 @@ def get_mft_credentials():
     window = tkinter.Tk()
     window.title("MFT Login")
 
+    host_label = ttk.Label(window, text="MFT Link")
+    host_label.grid(row=0, column=0)
+    host_input = ttk.Entry(window, width=50)
+    host_input.grid(row=0, column=1)
+
     username_label = ttk.Label(window, text="Username")
-    username_label.grid(row=0, column=0)
+    username_label.grid(row=1, column=0)
     username_input = ttk.Entry(window, width=50)
-    username_input.grid(row=0, column=1)
+    username_input.grid(row=1, column=1)
 
     pswd_label = ttk.Label(window, text="Password")
-    pswd_label.grid(row=1, column=0)
+    pswd_label.grid(row=2, column=0)
     pswd_input = ttk.Entry(window, width=50, show="*")
-    pswd_input.grid(row=1, column=1)
+    pswd_input.grid(row=2, column=1)
 
-    submit_btn = ttk.Button(window, text="Login", command= lambda: set_credentials(window=window, username=username_input.get(), password=pswd_input.get()))
+    submit_btn = ttk.Button(window, text="Login", command= lambda: set_credentials(window=window, host=host_input.get(), username=username_input.get(), password=pswd_input.get()))
     submit_btn.grid(row=4, column=0)
     window.mainloop()
 
@@ -80,7 +86,7 @@ if __name__ == '__main__':
                            msg="Cannot share more than 20 files at a time.",
                            threaded=True)
     else:
-        mft = Client(host=keyring.get_password('mcs', 'mft_host'))
+        mft = Client(host=keyring.get_password('mft', 'host'))
         while True:
             try:
                 mft.login(username=keyring.get_password('mft', 'user'), password=keyring.get_password('mft', 'pswd'))
