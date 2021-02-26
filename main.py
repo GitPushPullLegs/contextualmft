@@ -9,10 +9,11 @@ from win10toast import ToastNotifier
 import pyperclip
 import getpass
 import win32com.client
+import tkinter
+from tkinter import ttk
 
 
 def setup(username: str):
-    print(os.path.join(os.path.split(__file__)[0], 'Trigger.bat'))
     file_pieces = "/".join(__file__.split("/")[:-1])
     # Make trigger bat script.
     with open(os.path.join(os.path.split(__file__)[0], 'Trigger.bat'), 'w') as bat:
@@ -32,10 +33,35 @@ def setup(username: str):
     shortcut.save()
 
 
+def set_credentials(window, username: str, password: str):
+    window.destroy()
+    keyring.set_password('mft', 'user', username)
+    keyring.set_password('mft', 'pswd', password)
+
+
+def get_mft_credentials():
+    window = tkinter.Tk()
+    window.title("MFT Login")
+
+    username_label = ttk.Label(window, text="Username")
+    username_label.grid(row=0, column=0)
+    username_input = ttk.Entry(window, width=50)
+    username_input.grid(row=0, column=1)
+
+    pswd_label = ttk.Label(window, text="Password")
+    pswd_label.grid(row=1, column=0)
+    pswd_input = ttk.Entry(window, width=50, show="*")
+    pswd_input.grid(row=1, column=1)
+
+    submit_btn = ttk.Button(window, text="Login", command= lambda: set_credentials(window=window, username=username_input.get(), password=pswd_input.get()))
+    submit_btn.grid(row=4, column=0)
+    window.mainloop()
+
 if __name__ == '__main__':
     username = getpass.getuser()
     send_to_path = rf"C:\Users\{username}\AppData\Roaming\Microsoft\Windows\SendTo"
     if not glob.glob(send_to_path + '/Share with MFT*'):
+        get_mft_credentials()
         setup(username)
 
     toaster = ToastNotifier()
@@ -55,10 +81,19 @@ if __name__ == '__main__':
                            threaded=True)
     else:
         mft = Client(host=keyring.get_password('mcs', 'mft_host'))
-        mft.login(username=keyring.get_password('mcs', 'ae-user'), password=keyring.get_password('mcs', 'ae-pass'))
+        while True:
+            try:
+                mft.login(username=keyring.get_password('mft', 'user'), password=keyring.get_password('mft', 'pswd'))
+                break
+            except ConnectionRefusedError:
+                get_mft_credentials()
+                pass
+
         password = generate_mnemonic_password()
-        link = mft.create_file_share(share_type=Client.ShareType.send, files=mft_files, password=password, subject=f'MFT Context Menu Share {timestamp}')
-        output_file = open(os.path.join(os.path.split(input_files[0])[0], f'MFT Context Menu Share {timestamp}.txt'), 'w')
+        link = mft.create_file_share(share_type=Client.ShareType.send, files=mft_files, password=password,
+                                     subject=f'MFT Context Menu Share {timestamp}')
+        output_file = open(os.path.join(os.path.split(input_files[0])[0], f'MFT Context Menu Share {timestamp}.txt'),
+                           'w')
         output_file.write(f"Link: {link}\n")
         output_file.write(f"Password: {password}\n\n")
         output_file.write(f"Files:\n")
