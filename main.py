@@ -29,7 +29,7 @@ if __name__ == '__main__':
         mft.login(username=keyring.get_password('mcs', 'ae-user'), password=keyring.get_password('mcs', 'ae-pass'))
         password = generate_mnemonic_password()
         link = mft.create_file_share(share_type=Client.ShareType.send, files=mft_files, password=password, subject=f'MFT Context Menu Share {timestamp}')
-        output_file = open(os.path.join(os.path.split(input_files[0])[0], 'MFT Context Menu Share {timestamp}.txt'), 'w')
+        output_file = open(os.path.join(os.path.split(input_files[0])[0], f'MFT Context Menu Share {timestamp}.txt'), 'w')
         output_file.write(f"Link: {link}\n")
         output_file.write(f"Password: {password}\n\n")
         output_file.write(f"Files:\n")
