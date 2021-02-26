@@ -1,0 +1,6 @@
+setup.py
+mft.egg-info/PKG-INFO
+mft.egg-info/SOURCES.txt
+mft.egg-info/dependency_links.txt
+mft.egg-info/requires.txt
+mft.egg-info/top_level.txt
